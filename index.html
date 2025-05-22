@@ -53,20 +53,20 @@
         <div class="columns is-centered">
           <div class="column has-text-centered">
             <h1 class="title is-1 publication-title">Academic Project Page</h1>
-            <div class="is-size-5 publication-authors">
+            <!-- <div class="is-size-5 publication-authors"> -->
               <!-- Paper authors -->
-              <span class="author-block">
+              <!-- <span class="author-block">
                 <a href="FIRST AUTHOR PERSONAL LINK" target="_blank">First Author</a><sup>*</sup>,</span>
               <span class="author-block">
                 <a href="SECOND AUTHOR PERSONAL LINK" target="_blank">Second Author</a><sup>*</sup>,</span>
               <span class="author-block">
                 <a href="THIRD AUTHOR PERSONAL LINK" target="_blank">Third Author</a>
               </span>
-            </div>
+            </div> -->
 
             <div class="is-size-5 publication-authors">
-              <span class="author-block">Institution Name<br>Conferance name and year</span>
-              <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span>
+              <span class="author-block">Anonymous Author(s)</span>
+              <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
             </div>
 
             <div class="column has-text-centered">
@@ -173,7 +173,16 @@
   </section>
   <!-- End paper abstract -->
 
-  <!-- Image carousel -->
+  <!-- First Carousel Title -->
+  <section class="hero is-small carousel-title-section">
+    <div class="hero-body">
+      <div class="container">
+        <h2 class="title is-3 has-text-centered carousel-title">AutoT2IS</h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- First Image carousel -->
   <section class="hero is-small">
     <div class="hero-body">
       <div class="container">
@@ -390,6 +399,15 @@
         <div class="carousel-divider">
           <hr class="divider-line">
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Second Carousel Title -->
+  <section class="hero is-small carousel-title-section">
+    <div class="hero-body">
+      <div class="container">
+        <h2 class="title is-3 has-text-centered carousel-title">AutoT2IS+GPT-4</h2>
       </div>
     </div>
   </section>
@@ -612,7 +630,8 @@
       width: 100%;
       max-width: 1000px;
       margin: 0 auto;
-      padding: 20px 0;
+      padding-top: 10px;
+      padding-bottom: 20px;
     }
 
     /* 轮播图主体 */
@@ -757,7 +776,8 @@
       width: 100%;
       max-width: 1000px;
       margin: 0 auto;
-      padding: 20px 0;
+      padding-top: 10px;
+      padding-bottom: 20px;
     }
 
     .carousel-item-2 {
@@ -818,7 +838,7 @@
 
     /* Carousel divider styles */
     .carousel-divider {
-      margin: 20px 0;
+      margin: 40px 0;
       position: relative;
     }
 
@@ -829,13 +849,25 @@
       margin: 0;
     }
 
+    /* Carousel titles style */
+    .carousel-title-section .hero-body {
+      padding: 1rem 1.5rem;
+    }
+
+    .carousel-title {
+      margin-bottom: 0;
+      color: #363636;
+      font-weight: 300;
+    }
+
     /* Adjust spacing for carousels */
     .carousel-container, .carousel-container-2 {
       position: relative;
       width: 100%;
       max-width: 1000px;
       margin: 0 auto;
-      padding: 40px 0;
+      padding-top: 10px;
+      padding-bottom: 20px;
     }
   </style>
 
