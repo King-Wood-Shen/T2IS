@@ -42,6 +42,127 @@
   <script src="static/js/bulma-carousel.min.js"></script>
   <script src="static/js/bulma-slider.min.js"></script>
   <script src="static/js/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const data = {
+        'Character Generation': [
+          ["Multi-Scenario", 25],
+          ["Multi-Expression", 21],
+          ["Multi-view", 21],
+          ["Multi-pose", 28],
+          ["Portrait Design", 22],
+        ],
+        'Design Style Generation': [
+          ["Creative Style", 36],
+          ["Poster Design", 20],
+          ["Font Design", 20],
+          ["IP Product", 20],
+          ["Home Decoration", 20]
+        ],
+        'Story Generation': [
+          ["Movie Shot", 20],
+          ["Comic Story", 20],
+          ["Children Book", 20],
+          ["News Illustration", 24],
+          ["Hist. Narrative", 21]
+        ],
+        'Process Generation': [
+          ["Growth Process", 23],
+          ["Draw Process", 22],
+          ["Cooking Process", 27],
+          ["Physical Law", 22],
+          ["Arch. Building", 20],
+          ["Evolution Illustration", 25]
+        ],
+        'Instruction Generation': [
+          ["Education Illustration", 23],
+          ["Historical Panel", 21],
+          ["Product Instruction", 21],
+          ["Travel Guide", 24],
+          ["Activity Arrange", 25]
+        ]
+      };
+
+      const ctx = document.getElementById('mainCategoryChart');
+      
+      // Calculate total for each main category
+      const mainCategories = Object.keys(data);
+      const mainTotals = mainCategories.map(cat => 
+        data[cat].reduce((sum, [_, val]) => sum + val, 0)
+      );
+
+      // Prepare data for subcategories
+      const allSubcategories = [];
+      const allSubcategoryValues = [];
+      const subCategoryColors = [];
+      const mainCategoryColors = [
+        'rgb(255, 99, 132)',
+        'rgb(54, 162, 235)',
+        'rgb(255, 206, 86)',
+        'rgb(75, 192, 192)',
+        'rgb(153, 102, 255)'
+      ];
+
+      mainCategories.forEach((mainCat, idx) => {
+        const baseColor = mainCategoryColors[idx];
+        data[mainCat].forEach(([subCat, val]) => {
+          allSubcategories.push(subCat);
+          allSubcategoryValues.push(val);
+          // Create slightly different shades for subcategories
+          subCategoryColors.push(baseColor.replace(')', ', 0.7)'));
+        });
+      });
+
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: [...mainCategories, ...allSubcategories],
+          datasets: [{
+            data: mainTotals,
+            backgroundColor: mainCategoryColors,
+            radius: '70%',
+            weight: 1
+          }, {
+            data: allSubcategoryValues,
+            backgroundColor: subCategoryColors,
+            radius: '90%',
+            weight: 0.5
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'right',
+            },
+            title: {
+              display: true,
+              text: 'Dataset Distribution'
+            }
+          }
+        }
+      });
+    });
+  </script>
+  <style>
+    .dataset-viz {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .donut-chart-block {
+        position: relative;
+        width: 100%;
+        height: 500px;
+    }
+    .donut-chart {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+  </style>
 </head>
 
 <body>
@@ -53,21 +174,39 @@
         <div class="columns is-centered">
           <div class="column has-text-centered">
             <h1 class="title is-1 publication-title">Academic Project Page</h1>
-            <!-- <div class="is-size-5 publication-authors"> -->
-              <!-- Paper authors -->
-              <!-- <span class="author-block">
-                <a href="FIRST AUTHOR PERSONAL LINK" target="_blank">First Author</a><sup>*</sup>,</span>
-              <span class="author-block">
-                <a href="SECOND AUTHOR PERSONAL LINK" target="_blank">Second Author</a><sup>*</sup>,</span>
-              <span class="author-block">
-                <a href="THIRD AUTHOR PERSONAL LINK" target="_blank">Third Author</a>
-              </span>
-            </div> -->
-
             <div class="is-size-5 publication-authors">
-              <span class="author-block">Anonymous Author(s)</span>
-              <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
+              <!-- Paper authors -->
+              <span class="author-block">
+                <a href="https://chengyou-jia.github.io/" target="_blank">Chengyou Jia</a><sup>*</sup>,</span>
+              <span class="author-block">
+                <a href="https://king-wood-shen.github.io/Xin-Shen.github.io/" target="_blank">Xin Shen</a><sup>*</sup>,</span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=8qX4Z5IAAAAJ" target="_blank">Zhuohang Dang</a>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">Changliang Xia</a>,
+              </span>
+              <span class="author-block">
+                <a href="https://weijiawu.github.io/" target="_blank">Weijia Wu</a>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">Xinyu Zhang</a>,
+              </span>
+              <span class="author-block">
+                <a href="https://hangwei12358.github.io/" target="_blank">Huangwei Qian</a>,
+              </span>
+              <span class="author-block">
+                <a href="https://www.a-star.edu.sg/cfar/about-cfar/management/prof-ivor-tsang" target="_blank">Ivor Tsang</a>,
+              </span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?hl=zh-CN&user=C3ujEF0AAAAJ&view_op=list_works&sortby=pubdate" target="_blank">Minnan Luo</a>
+              </span>
             </div>
+
+            <!-- <div class="is-size-5 publication-authors">
+              <span class="author-block"><a href="https://chengyou-jia.github.io/">Chengyou Jia</a></span>
+              <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
+            <!-- </div> --> 
 
             <div class="column has-text-centered">
               <div class="publication-links">
@@ -82,14 +221,14 @@
                   </a>
                 </span>
 
-                <!-- Supplementary PDF link -->
+                <!-- Data Hugging Face link -->
                 <span class="link-block">
                   <a href="static/pdfs/supplementary_material.pdf" target="_blank"
                     class="external-link button is-normal is-rounded is-dark">
                     <span class="icon">
-                      <i class="fas fa-file-pdf"></i>
+                      🤗
                     </span>
-                    <span>Supplementary</span>
+                    <span>Data</span>
                   </a>
                 </span>
 
@@ -132,8 +271,7 @@
           <source src="static/videos/video.pptx.mp4" type="video/mp4">
         </video>
         <h2 class="subtitle has-text-centered">
-          Aliquam vitae elit ullamcorper tellus egestas pellentesque. Ut lacus tellus, maximus vel lectus at, placerat
-          pretium mi. Maecenas dignissim tincidunt vestibulum. Sed consequat hendrerit nisl ut maximus.
+
         </h2>
       </div>
     </div>
@@ -173,6 +311,7 @@
   </section>
   <!-- End paper abstract -->
 
+  
   <!-- First Carousel Title -->
   <section class="hero is-small carousel-title-section">
     <div class="hero-body">
