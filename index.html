@@ -43,130 +43,17 @@
   <script src="static/js/bulma-slider.min.js"></script>
   <script src="static/js/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const data = {
-        'Character Generation': [
-          ["Multi-Scenario", 25],
-          ["Multi-Expression", 21],
-          ["Multi-view", 21],
-          ["Multi-pose", 28],
-          ["Portrait Design", 22],
-        ],
-        'Design Style Generation': [
-          ["Creative Style", 36],
-          ["Poster Design", 20],
-          ["Font Design", 20],
-          ["IP Product", 20],
-          ["Home Decoration", 20]
-        ],
-        'Story Generation': [
-          ["Movie Shot", 20],
-          ["Comic Story", 20],
-          ["Children Book", 20],
-          ["News Illustration", 24],
-          ["Hist. Narrative", 21]
-        ],
-        'Process Generation': [
-          ["Growth Process", 23],
-          ["Draw Process", 22],
-          ["Cooking Process", 27],
-          ["Physical Law", 22],
-          ["Arch. Building", 20],
-          ["Evolution Illustration", 25]
-        ],
-        'Instruction Generation': [
-          ["Education Illustration", 23],
-          ["Historical Panel", 21],
-          ["Product Instruction", 21],
-          ["Travel Guide", 24],
-          ["Activity Arrange", 25]
-        ]
-      };
-
-      const ctx = document.getElementById('mainCategoryChart');
-      
-      // Calculate total for each main category
-      const mainCategories = Object.keys(data);
-      const mainTotals = mainCategories.map(cat => 
-        data[cat].reduce((sum, [_, val]) => sum + val, 0)
-      );
-
-      // Prepare data for subcategories
-      const allSubcategories = [];
-      const allSubcategoryValues = [];
-      const subCategoryColors = [];
-      const mainCategoryColors = [
-        'rgb(255, 99, 132)',
-        'rgb(54, 162, 235)',
-        'rgb(255, 206, 86)',
-        'rgb(75, 192, 192)',
-        'rgb(153, 102, 255)'
-      ];
-
-      mainCategories.forEach((mainCat, idx) => {
-        const baseColor = mainCategoryColors[idx];
-        data[mainCat].forEach(([subCat, val]) => {
-          allSubcategories.push(subCat);
-          allSubcategoryValues.push(val);
-          // Create slightly different shades for subcategories
-          subCategoryColors.push(baseColor.replace(')', ', 0.7)'));
-        });
-      });
-
-      new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: [...mainCategories, ...allSubcategories],
-          datasets: [{
-            data: mainTotals,
-            backgroundColor: mainCategoryColors,
-            radius: '70%',
-            weight: 1
-          }, {
-            data: allSubcategoryValues,
-            backgroundColor: subCategoryColors,
-            radius: '90%',
-            weight: 0.5
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'right',
-            },
-            title: {
-              display: true,
-              text: 'Dataset Distribution'
-            }
-          }
-        }
-      });
-    });
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <style>
-    .dataset-viz {
-        width: 100%;
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-    .donut-chart-block {
-        position: relative;
-        width: 100%;
-        height: 500px;
-    }
-    .donut-chart {
-        position: relative;
-        width: 100%;
-        height: 100%;
+    #chart-container { 
+      width: 600px; 
+      height: 600px; 
+      margin: 2rem auto; 
     }
   </style>
 </head>
 
 <body>
-
 
   <section class="hero">
     <div class="hero-body">
@@ -311,7 +198,200 @@
   </section>
   <!-- End paper abstract -->
 
-  
+  <!-- Chart section -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3" style="margin-bottom: 10px;">T2IS-Bench</h2>
+          <div id="chart-container" style="width: 600px; height: 600px; margin: 0 auto; padding: 5px;">
+            <canvas id="myChart"></canvas>
+          </div>
+          <p class="content has-text-justified" style="margin-top: 10px; max-width: 800px; margin-left: auto; margin-right: auto;">
+            We introduce T2IS-Bench, a benchmark designed to comprehensively assess text-to-image synthesis models by reflecting real-world consistency requirements. The accompanying pie chart illustrates the balanced distribution of user instructions across 26 distinct subcategories, highlighting the benchmark's broad coverage and its utility in advancing evaluation practices for generative AI systems.
+          </p>
+          <script>
+            // 子类（内层）
+            const innerLabels = [
+              "MS","ME","MV","MP","PD",
+              "CS","PSD","FD","IP","HD",
+              "MSH","CSY","CB","NI","HN",
+              "GP","DP","CP","PL","AB","EI","EI","HP","PI","TG","AA"
+            ];
+            const innerData = [
+              25,21,21,28,22,
+              36,20,20,20,20,
+              20,20,20,24,21,
+              23,22,27,22,20,25,23,21,21,24,25
+            ];
+            const innerFullNames = [
+              "Multi-Scenario (25)", "Multi-Expression (21)", "Multi-view (21)", "Multi-pose (28)", "Portrait Design (22)",
+              "Creative Style (36)", "Poster Design (20)", "Font Design (20)", "IP Product (20)", "Home Decoration (20)",
+              "Movie Shot (20)", "Comic Story (20)", "Children Book (20)", "News Illustration (24)", "Hist. Narrative (21)",
+              "Growth Process (23)", "Draw Process (22)", "Cooking Process (27)", "Physical Law (22)", "Arch. Building (20)",
+              "Evolution Illustration (25)", "Education Illustration (23)", "Historical Panel (21)", "Product Instruction (21)", "Travel Guide (24)", "Activity Arrange (25)"
+            ];
+
+            // 父类（外层）
+            const outerLabels = ["CG", "DSG", "SG", "PG", "IG"];
+            const outerData = [117, 116, 105, 139, 114];
+            const outerFullNames = [
+              "Character Generation",
+              "Design Style Generation",
+              "Story Generation",
+              "Process Generation",
+              "Instruction Generation"
+            ];
+
+            const data = {
+              datasets: [
+                {
+                  label: '子类',
+                  data: innerData,
+                  backgroundColor: [
+                    // CG (Character Generation) - 浅蓝色系
+                    '#BBD6F3', '#BBD6F3', '#BBD6F3', '#BBD6F3', '#BBD6F3',
+                    // DSG (Design Style Generation) - 浅绿色系
+                    '#B8E2CF', '#B8E2CF', '#B8E2CF', '#B8E2CF', '#B8E2CF',
+                    // SG (Story Generation) - 浅紫色系
+                    '#D9C1DB', '#D9C1DB', '#D9C1DB', '#D9C1DB', '#D9C1DB',
+                    // PG (Process Generation) - 浅橙色系
+                    '#F3D1BE', '#F3D1BE', '#F3D1BE', '#F3D1BE', '#F3D1BE', '#F3D1BE',
+                    // IG (Instruction Generation) - 浅红色系
+                    '#F3BEBE', '#F3BEBE', '#F3BEBE', '#F3BEBE', '#F3BEBE', '#F3BEBE'
+                  ],
+                  datalabels: { 
+                    color: '#000000', 
+                    font: { size: 12, weight: 'bold' },
+                    anchor: 'center',
+                    align: 'center'
+                  },
+                  radius: '95%',  // 增加内圈大小
+                  weight: 1
+                },
+                {
+                  label: '父类',
+                  data: outerData,
+                  backgroundColor: [
+                    '#4A90E2',  // CG - 深蓝色
+                    '#56B794',  // DSG - 深绿色
+                    '#9B6B9D',  // SG - 深紫色
+                    '#E69B76',  // PG - 深橙色
+                    '#E67B7B'   // IG - 深红色
+                  ],
+                  datalabels: { 
+                    color: '#000000', 
+                    font: { size: 20, weight: 'bold' },
+                    anchor: 'center',
+                    align: 'center'
+                  },
+                  radius: '100%',  // 增加外圈大小
+                  weight: 1
+                }
+              ]
+            };
+
+            const config = {
+              type: 'doughnut',
+              data: data,
+              options: {
+                cutout: '0%',  // 将中心设置为实心
+                radius: '98%',  // 增加图表占比
+                layout: {
+                  padding: 0  // 移除图表内边距
+                },
+                plugins: {
+                  legend: { display: false },
+                  tooltip: {
+                    callbacks: {
+                      label: function(context) {
+                        if (context.datasetIndex === 0) {
+                          return innerFullNames[context.dataIndex] + '';
+                        } else {
+                          return outerFullNames[context.dataIndex] + ' (' + context.parsed + ')';
+                        }
+                      }
+                    }
+                  },
+                  datalabels: {
+                    formatter: function(value, context) {
+                      if (context.datasetIndex === 0) {
+                        return innerLabels[context.dataIndex];
+                      } else {
+                        return outerLabels[context.dataIndex];
+                      }
+                    }
+                  }
+                }
+              },
+              plugins: [ChartDataLabels]
+            };
+
+            new Chart(document.getElementById('myChart'), config);
+          </script>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 添加类别选择器和表格容器 -->
+  <div class="columns is-centered">
+    <div class="column is-10">
+        <h2 class="title is-3 has-text-centered" style="margin-bottom: 20px;">Leaderboard</h2>
+        <div class="box" style="padding: 1.25rem 1.25rem 0.5rem 1.25rem;">
+            <!-- 类别选择器改为横向布局 -->
+            <div class="category-selector" style="margin-bottom: 10px;">
+                <div class="tabs is-centered">
+                    <ul>
+                        <li class="is-active" data-category="All"><a>All</a></li>
+                        <li data-category="Character Generation"><a>Character Generation</a></li>
+                        <li data-category="Design Style Generation"><a>Design Style Generation</a></li>
+                        <li data-category="Story Generation"><a>Story Generation</a></li>
+                        <li data-category="Process Generation"><a>Process Generation</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- 表格容器 -->
+            <div class="table-container">
+                <table class="table is-narrow is-hoverable is-fullwidth custom-table" id="modelScoresTable">
+                    <thead>
+                        <tr class="header-top">
+                            <th rowspan="2" class="sortable left-align" data-field="model">Model</th>
+                            <th rowspan="2" class="sortable" data-field="aesthetics">Aesthetics</th>
+                            <th colspan="3" class="category-header">Prompt Alignment</th>
+                            <th colspan="3" class="category-header">Visual Consistency</th>
+                            <th rowspan="2" class="sortable" data-field="avg">Avg.</th>
+                        </tr>
+                        <tr class="header-bottom">
+                            <th class="sortable" data-field="pa_entity">Entity</th>
+                            <th class="sortable" data-field="pa_attribute">Attribute</th>
+                            <th class="sortable" data-field="pa_relation">Relation</th>
+                            <th class="sortable" data-field="vc_identity">Identity</th>
+                            <th class="sortable" data-field="vc_style">Style</th>
+                            <th class="sortable" data-field="vc_logic">Logic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Table content will be dynamically populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Method Section -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Method</h2>
+      <div class="content has-text-centered">
+        <img src="static/images/method/evaluation.png" alt="Evaluation Framework" style="width: 100%; margin-bottom: 2rem;"/>
+        <img src="static/images/method/overview.png" alt="Method Overview" style="width: 100%;"/>
+      </div>
+    </div>
+  </section>
+
   <!-- First Carousel Title -->
   <section class="hero is-small carousel-title-section">
     <div class="hero-body">
@@ -760,9 +840,58 @@
       </div>
     </div>
   </section>
+  
+  <!--BibTex citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>BibTex Code Here</code></pre>
+    </div>
+  </section>
+  <!--End BibTex citation -->
 
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+
+            <p>
+              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template"
+                target="_blank">Academic Project Page Template</a> which was adopted from the <a
+                href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+              You are free to borrow the source code of this website, we just ask that you link back to this page in the
+              footer. <br> This website is licensed under a <a rel="license"
+                href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+                Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+
+
+  
 
   <style>
+    .tabs ul {
+        border-bottom-color: #dbdbdb;
+    }
+    .tabs li {
+        cursor: pointer;
+    }
+    .tabs li.is-active a {
+        border-bottom-color: #485fc7;
+        color: #485fc7;
+    }
+    .tabs a {
+        padding: 0.5em 2em;
+    }
+
     /* 轮播图容器 */
     .carousel-container {
       position: relative;
@@ -1008,9 +1137,250 @@
       padding-top: 10px;
       padding-bottom: 20px;
     }
+
+    .table-container {
+        margin-top: 2rem;
+        overflow-x: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .custom-table {
+        border: none;
+        background: white;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .custom-table th, .custom-table td {
+        padding: 12px 15px;
+        border: 1px solid #e0e0e0;
+    }
+    .sortable {
+        cursor: pointer;
+        user-select: none;
+        position: relative;
+    }
+    .sortable:hover {
+        background-color: #f8f9fa;
+    }
+    .sortable::after {
+        content: '↕';
+        position: absolute;
+        right: 8px;
+        opacity: 0.3;
+    }
+    .sortable.sorted-asc::after {
+        content: '↑';
+        opacity: 1;
+    }
+    .sortable.sorted-desc::after {
+        content: '↓';
+        opacity: 1;
+    }
+    .table th {
+        position: sticky;
+        top: 0;
+        background: #f8f9fa;
+        z-index: 1;
+        text-align: center !important;
+        vertical-align: middle !important;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    .table td {
+        text-align: center;
+    }
+    
+    .table tbody tr {
+        position: relative;
+        transition: transform 0.5s ease-in-out;
+    }
+    .category-header, .header-top th {
+        font-weight: bold;
+        background-color: #f8f9fa !important;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0 !important;
+    }
+    .header-top th {
+        border-top: none !important;
+    }
+    .header-bottom th {
+        border-bottom: 2px solid #e0e0e0;
+        font-weight: 600;
+        color: #546e7a;
+    }
+    .highlight-row {
+        background-color: rgba(241, 245, 249, 0.7) !important;
+    }
+    .highlight-row:hover {
+        background-color: rgba(241, 245, 249, 0.9) !important;
+    }
+    .bold-value {
+        font-weight: bold;
+        color: #1a73e8;
+    }
+    .left-align {
+        text-align: left !important;
+    }
+    tr:hover td {
+        background-color: #f5f9ff;
+    }
+    tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+    }
+    tbody tr:last-child {
+        border-bottom: none;
+    }
+    .custom-table tr:first-child th:first-child {
+        border-top-left-radius: 8px;
+    }
+    .custom-table tr:first-child th:last-child {
+        border-top-right-radius: 8px;
+    }
+    tbody tr:last-child td:first-child {
+        border-bottom-left-radius: 8px;
+    }
+    tbody tr:last-child td:last-child {
+        border-bottom-right-radius: 8px;
+    }
+
+    /* 更新类别选择器的样式 */
+    .category-selector .box {
+        padding: 1.25rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 0;
+    }
+    .category-selector .title {
+        margin-bottom: 0 !important;
+        color: #2c3e50;
+        white-space: nowrap;
+    }
+    .category-selector .select {
+        margin-bottom: 0;
+    }
+    .category-selector select {
+        border-radius: 4px;
+        border: 1px solid #e0e0e0;
+        padding: 8px 12px;
+        font-size: 1rem;
+        color: #2c3e50;
+        transition: all 0.3s ease;
+    }
+    .category-selector select:hover {
+        border-color: #1a73e8;
+    }
+    .category-selector select:focus {
+        border-color: #1a73e8;
+        box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+    }
+    .mb-4 {
+        margin-bottom: 1.5rem !important;
+    }
   </style>
 
+
+
+
   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 初始化类别选择器
+        const tabs = document.querySelectorAll('.tabs li');
+        
+        // 初始化表格显示 All 类别的数据
+        filterByCategory('All');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有活动状态
+                tabs.forEach(t => t.classList.remove('is-active'));
+                // 设置当前选中状态
+                tab.classList.add('is-active');
+                // 获取类别并过滤表格
+                const category = tab.dataset.category;
+                filterByCategory(category);
+            });
+        });
+
+        // 初始化排序功能
+        const headers = document.querySelectorAll('.sortable');
+        headers.forEach(header => {
+            header.addEventListener('click', function() {
+                const field = this.dataset.field;
+                const isAscending = !this.classList.contains('sorted-asc');
+                
+                // 移除所有排序指示器
+                headers.forEach(h => {
+                    h.classList.remove('sorted-asc', 'sorted-desc');
+                });
+                
+                // 添加新的排序指示器
+                this.classList.add(isAscending ? 'sorted-asc' : 'sorted-desc');
+                
+                sortTable(field, isAscending);
+            });
+        });
+    });
+
+    function filterByCategory(category) {
+        console.log('Selected category:', category); // 添加调试日志
+        const tableData = {
+            'All': [
+                ['SDXL-base', '4.12', '4.23', '4.15', '4.08', '4.21', '4.18', '4.16', '4.16'],
+                ['SDXL-refiner', '4.15', '4.25', '4.17', '4.10', '4.23', '4.20', '4.18', '4.18'],
+                ['SD2.1', '4.08', '4.19', '4.11', '4.04', '4.17', '4.14', '4.12', '4.12']
+            ],
+            'Character Generation': [
+                ['SDXL-base', '4.15', '4.26', '4.18', '4.11', '4.24', '4.21', '4.19', '4.19'],
+                ['SDXL-refiner', '4.18', '4.28', '4.20', '4.13', '4.26', '4.23', '4.21', '4.21'],
+                ['SD2.1', '4.11', '4.22', '4.14', '4.07', '4.20', '4.17', '4.15', '4.15']
+            ],
+            'Design Style Generation': [
+                ['SDXL-base', '4.14', '4.25', '4.17', '4.10', '4.23', '4.20', '4.18', '4.18'],
+                ['SDXL-refiner', '4.17', '4.27', '4.19', '4.12', '4.25', '4.22', '4.20', '4.20'],
+                ['SD2.1', '4.10', '4.21', '4.13', '4.06', '4.19', '4.16', '4.14', '4.14']
+            ],
+            'Story Generation': [
+                ['SDXL-base', '4.13', '4.24', '4.16', '4.09', '4.22', '4.19', '4.17', '4.17'],
+                ['SDXL-refiner', '4.16', '4.26', '4.18', '4.11', '4.24', '4.21', '4.19', '4.19'],
+                ['SD2.1', '4.09', '4.20', '4.12', '4.05', '4.18', '4.15', '4.13', '4.13']
+            ],
+            'Process Generation': [
+                ['SDXL-base', '4.11', '4.22', '4.14', '4.07', '4.20', '4.17', '4.15', '4.15'],
+                ['SDXL-refiner', '4.14', '4.24', '4.16', '4.09', '4.22', '4.19', '4.17', '4.17'],
+                ['SD2.1', '4.07', '4.18', '4.10', '4.03', '4.16', '4.13', '4.11', '4.11']
+            ]
+        };
+
+        const tbody = document.querySelector('#modelScoresTable tbody');
+        tbody.innerHTML = ''; // 清空表格
+
+        // 获取选中类别的数据
+        const data = tableData[category];
+        if (!data) {
+            console.error('No data found for category:', category); // 添加错误日志
+            return;
+        }
+
+        // 填充表格
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            row.forEach((cell, index) => {
+                const td = document.createElement('td');
+                td.textContent = cell;
+                if (index === 0) td.classList.add('left-align');
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    }
+
+    // 页面加载时显示 All 类别的数据
+    document.addEventListener('DOMContentLoaded', function() {
+        filterByCategory('All');
+    });
+
+
     document.addEventListener('DOMContentLoaded', function () {
       // 初始化第一个轮播图
       function initCarousel(containerClass, itemClass, buttonClass, indicatorsClass) {
@@ -1083,59 +1453,525 @@
       initCarousel('carousel-container', 'carousel-item', 'carousel-button', 'carousel-indicators');
       initCarousel('carousel-container-2', 'carousel-item-2', 'carousel-button-2', 'carousel-indicators-2');
     });
+
+    let currentMode = 'All';
+
+    const model_scores = {
+        "All": {
+            "Anole": {
+                "Aesthetics": 0.170,
+                "Prompt Alignment": {
+                    "Entity": 0.534,
+                    "Attribute": 0.611,
+                    "Relation": 0.570
+                },
+                "Visual Consistency": {
+                    "Identity": 0.115,
+                    "Style": 0.148,
+                    "Logic": 0.090
+                },
+                "Avg.": 0.264
+            },
+            "Show-o": {
+                "Aesthetics": 0.206,
+                "Prompt Alignment": {
+                    "Entity": 0.780,
+                    "Attribute": 0.785,
+                    "Relation": 0.776
+                },
+                "Visual Consistency": {
+                    "Identity": 0.233,
+                    "Style": 0.287,
+                    "Logic": 0.285
+                },
+                "Avg.": 0.264
+            },
+            "Janus-Pro": {
+                "Aesthetics": 0.333,
+                "Prompt Alignment": {
+                    "Entity": 0.787,
+                    "Attribute": 0.785,
+                    "Relation": 0.781
+                },
+                "Visual Consistency": {
+                    "Identity": 0.224,
+                    "Style": 0.272,
+                    "Logic": 0.300
+                },
+                "Avg.": 0.435
+            },
+            "Gemini & SD3": {
+                "Aesthetics": 0.500,
+                "Prompt Alignment": {
+                    "Entity": 0.796,
+                    "Attribute": 0.794,
+                    "Relation": 0.789
+                },
+                "Visual Consistency": {
+                    "Identity": 0.287,
+                    "Style": 0.244,
+                    "Logic": 0.320
+                },
+                "Avg.": 0.480
+            },
+            "Gemini & Pixart": {
+                "Aesthetics": 0.447,
+                "Prompt Alignment": {
+                    "Entity": 0.743,
+                    "Attribute": 0.765,
+                    "Relation": 0.747
+                },
+                "Visual Consistency": {
+                    "Identity": 0.206,
+                    "Style": 0.279,
+                    "Logic": 0.268
+                },
+                "Avg.": 0.440
+            },
+            "Gemini & Hunyuan": {
+                "Aesthetics": 0.410,
+                "Prompt Alignment": {
+                    "Entity": 0.758,
+                    "Attribute": 0.774,
+                    "Relation": 0.765
+                },
+                "Visual Consistency": {
+                    "Overall": 0.774,
+                    "Identity": 0.197,
+                    "Style": 0.276,
+                    "Logic": 0.271
+                },
+                "Avg.": 0.436
+            },
+            "Gemini & Flux-1": {
+                "Aesthetics": 0.533,
+                "Prompt Alignment": {
+                    "Entity": 0.791,
+                    "Attribute": 0.790,
+                    "Relation": 0.786
+                },
+                "Visual Consistency": {
+                    "Identity": 0.249,
+                    "Style": 0.302,
+                    "Logic": 0.328
+                },
+                "Avg.": 0.490
+            },
+            "ChatDit": {
+                "Aesthetics": 0.414,
+                "Prompt Alignment": {
+                    "Entity": 0.717,
+                    "Attribute": 0.726,
+                    "Relation": 0.726
+                },
+                "Visual Consistency": {
+                    "Identity": 0.296,
+                    "Style": 0.326,
+                    "Logic": 0.310
+                },
+                "Avg.": 0.455
+            },
+            "ISG-Agent": {
+                "Aesthetics": 0.256,
+                "Prompt Alignment": {
+                    "Entity": 0.667,
+                    "Attribute": 0.703,
+                    "Relation": 0.682
+                },
+                "Visual Consistency": {
+                    "Identity": 0.146,
+                    "Style": 0.178,
+                    "Logic": 0.163
+                },
+                "Avg.": 0.338
+            },
+            "AutoT2IS (ours)": {
+                "Aesthetics": 0.520,
+                "Prompt Alignment": {
+                    "Entity": 0.729,
+                    "Attribute": 0.756,
+                    "Relation": 0.743
+                },
+                "Visual Consistency": {
+                    "Identity": 0.359,
+                    "Style": 0.414,
+                    "Logic": 0.356
+                },
+                "Avg.": 0.515
+            },
+            "Gemini 2.0 Flash": {
+                "Aesthetics": 0.430,
+                "Prompt Alignment": {
+                    "Entity": 0.738,
+                    "Attribute": 0.747,
+                    "Relation": 0.743
+                },
+                "Visual Consistency": {
+                    "Identity": 0.428,
+                    "Style": 0.383,
+                    "Logic": 0.392
+                },
+                "Avg.": 0.509
+            },
+            "GPT-4o": {
+                "Aesthetics": 0.445,
+                "Prompt Alignment": {
+                    "Entity": 0.663,
+                    "Attribute": 0.683,
+                    "Relation": 0.693
+                },
+                "Visual Consistency": {
+                    "Identity": 0.400,
+                    "Style": 0.463,
+                    "Logic": 0.383
+                },
+                "Avg.": 0.501
+            },
+            "AutoT2IS + GPT-4o": {
+                "Aesthetics": 0.567,
+                "Prompt Alignment": {
+                    "Entity": 0.754,
+                    "Attribute": 0.761,
+                    "Relation": 0.763
+                },
+                "Visual Consistency": {
+                    "Identity": 0.441,
+                    "Style": 0.520,
+                    "Logic": 0.416
+                },
+                "Avg.": 0.571
+            }
+        },
+        "Character Generation": {
+            "PhotoMaker": {
+                "Aesthetics": 0.413,
+                "Prompt Alignment": {
+                    "Entity": 0.793,
+                    "Attribute": 0.799,
+                    "Relation": 0.762
+                },
+                "Visual Consistency": {
+                    "Identity": 0.482,
+                    "Style": 0.458,
+                    "Logic": 0.450
+                },
+                "Avg.": 0.552
+            },
+            "OnePrompt": {
+                "Aesthetics": 0.600,
+                "Prompt Alignment": {
+                    "Entity": 0.805,
+                    "Attribute": 0.807,
+                    "Relation": 0.766
+                },
+                "Visual Consistency": {
+                    "Identity": 0.520,
+                    "Style": 0.512,
+                    "Logic": 0.470
+                },
+                "Avg.": 0.590
+            },
+            "X-Flux": {
+                "Aesthetics": 0.428,
+                "Prompt Alignment": {
+                    "Entity": 0.834,
+                    "Attribute": 0.804,
+                    "Relation": 0.780
+                },
+                "Visual Consistency": {
+                    "Identity": 0.531,
+                    "Style": 0.529,
+                    "Logic": 0.521
+                },
+                "Avg.": 0.553
+            },
+            "AutoT2IS (ours)": {
+                "Aesthetics": 0.557,
+                "Prompt Alignment": {
+                    "Entity": 0.798,
+                    "Attribute": 0.788,
+                    "Relation": 0.764
+                },
+                "Visual Consistency": {
+                    "Identity": 0.609,
+                    "Style": 0.520,
+                    "Logic": 0.509
+                },
+                "Avg.": 0.619
+            }
+        },
+        "Design Style Generation": {
+            "PAdapter-Flux": {
+                "Aesthetics": 0.514,
+                "Prompt Alignment": {
+                    "Entity": 0.856,
+                    "Attribute": 0.833,
+                    "Relation": 0.846
+                },
+                "Visual Consistency": {
+                    "Identity": 0.386,
+                    "Style": 0.455,
+                    "Logic": 0.517
+                },
+                "Avg.": 0.582
+            },
+            "AutoT2IS (ours)": {
+                "Aesthetics": 0.475,
+                "Prompt Alignment": {
+                    "Entity": 0.789,
+                    "Attribute": 0.791,
+                    "Relation": 0.792
+                },
+                "Visual Consistency": {
+                    "Identity": 0.339,
+                    "Style": 0.391,
+                    "Logic": 0.478
+                },
+                "Avg.": 0.533
+            }
+        },
+        "Story Generation": {
+            "ICLora-Story": {
+                "Aesthetics": 0.408,
+                "Prompt Alignment": {
+                    "Entity": 0.711,
+                    "Attribute": 0.739,
+                    "Relation": 0.702
+                },
+                "Visual Consistency": {
+                    "Identity": 0.078,
+                    "Style": 0.190,
+                    "Logic": 0.119
+                },
+                "Avg.": 0.361
+            },
+            "StoryDiffusion": {
+                "Aesthetics": 0.581,
+                "Prompt Alignment": {
+                    "Entity": 0.684,
+                    "Attribute": 0.728,
+                    "Relation": 0.670
+                },
+                "Visual Consistency": {
+                    "Identity": 0.182,
+                    "Style": 0.207,
+                    "Logic": 0.141
+                },
+                "Avg.": 0.413
+            },
+            "Story-Adapter": {
+                "Aesthetics": 0.578,
+                "Prompt Alignment": {
+                    "Entity": 0.749,
+                    "Attribute": 0.766,
+                    "Relation": 0.734
+                },
+                "Visual Consistency": {
+                    "Identity": 0.181,
+                    "Style": 0.328,
+                    "Logic": 0.226
+                },
+                "Avg.": 0.463
+            },
+            "AutoT2IS (ours)": {
+                "Aesthetics": 0.534,
+                "Prompt Alignment": {
+                    "Entity": 0.629,
+                    "Attribute": 0.698,
+                    "Relation": 0.660
+                },
+                "Visual Consistency": {
+                    "Identity": 0.262,
+                    "Style": 0.405,
+                    "Logic": 0.237
+                },
+                "Avg.": 0.456
+            }
+        },
+        "Process Generation": {
+            "MakeAnything": {
+                "Aesthetics": 0.358,
+                "Prompt Alignment": {
+                    "Entity": 0.636,
+                    "Attribute": 0.665,
+                    "Relation": 0.652
+                },
+                "Visual Consistency": {
+                    "Identity": 0.329,
+                    "Style": 0.340,
+                    "Logic": 0.222
+                },
+                "Avg.": 0.408
+            },
+            "AutoT2IS (ours)": {
+                "Aesthetics": 0.578,
+                "Prompt Alignment": {
+                    "Entity": 0.727,
+                    "Attribute": 0.754,
+                    "Relation": 0.739
+                },
+                "Visual Consistency": {
+                    "Identity": 0.314,
+                    "Style": 0.346,
+                    "Logic": 0.274
+                },
+                "Avg.": 0.493
+            }
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // 初始化类别选择器
+        const categorySelect = document.getElementById('categorySelect');
+        categorySelect.value = currentMode;
+        
+        populateTable();
+        
+        const headers = document.querySelectorAll('.sortable');
+        headers.forEach(header => {
+            header.addEventListener('click', function() {
+                const field = this.dataset.field;
+                const isAscending = !this.classList.contains('sorted-asc');
+                
+                // 移除所有排序指示器
+                headers.forEach(h => {
+                    h.classList.remove('sorted-asc', 'sorted-desc');
+                });
+                
+                // 添加新的排序指示器
+                this.classList.add(isAscending ? 'sorted-asc' : 'sorted-desc');
+                
+                sortTable(field, isAscending);
+            });
+        });
+    });
+
+    function populateTable() {
+        const tbody = document.querySelector('#modelScoresTable tbody');
+        tbody.innerHTML = ''; // 清空表格内容
+        
+        const currentData = model_scores[currentMode];
+        if (!currentData || Object.keys(currentData).length === 0) {
+            return; // 如果没有数据，直接返回
+        }
+        
+        const rows = Object.entries(currentData);
+        
+        // 找到每列的最大值
+        const maxValues = {
+            'Aesthetics': Math.max(...rows.map(([_, d]) => d.Aesthetics)),
+            'Entity': Math.max(...rows.map(([_, d]) => d["Prompt Alignment"].Entity)),
+            'Attribute': Math.max(...rows.map(([_, d]) => d["Prompt Alignment"].Attribute)),
+            'Relation': Math.max(...rows.map(([_, d]) => d["Prompt Alignment"].Relation)),
+            'Identity': Math.max(...rows.map(([_, d]) => d["Visual Consistency"].Identity)),
+            'Style': Math.max(...rows.map(([_, d]) => d["Visual Consistency"].Style)),
+            'Logic': Math.max(...rows.map(([_, d]) => d["Visual Consistency"].Logic)),
+            'Avg': Math.max(...rows.map(([_, d]) => d["Avg."]))
+        };
+
+        rows.forEach(([model, scores]) => {
+            const tr = document.createElement('tr');
+            if (model.includes('AutoT2IS')) {
+                tr.classList.add('highlight-row');
+            }
+
+            const isMaxAesthetics = scores.Aesthetics === maxValues.Aesthetics;
+            const isMaxEntity = scores["Prompt Alignment"].Entity === maxValues.Entity;
+            const isMaxAttribute = scores["Prompt Alignment"].Attribute === maxValues.Attribute;
+            const isMaxRelation = scores["Prompt Alignment"].Relation === maxValues.Relation;
+            const isMaxIdentity = scores["Visual Consistency"].Identity === maxValues.Identity;
+            const isMaxStyle = scores["Visual Consistency"].Style === maxValues.Style;
+            const isMaxLogic = scores["Visual Consistency"].Logic === maxValues.Logic;
+            const isMaxAvg = scores["Avg."] === maxValues.Avg;
+
+            tr.innerHTML = `
+                <td class="left-align">${model}</td>
+                <td class="${isMaxAesthetics ? 'bold-value' : ''}">${formatNumber(scores.Aesthetics)}</td>
+                <td class="${isMaxEntity ? 'bold-value' : ''}">${formatNumber(scores["Prompt Alignment"].Entity)}</td>
+                <td class="${isMaxAttribute ? 'bold-value' : ''}">${formatNumber(scores["Prompt Alignment"].Attribute)}</td>
+                <td class="${isMaxRelation ? 'bold-value' : ''}">${formatNumber(scores["Prompt Alignment"].Relation)}</td>
+                <td class="${isMaxIdentity ? 'bold-value' : ''}">${formatNumber(scores["Visual Consistency"].Identity)}</td>
+                <td class="${isMaxStyle ? 'bold-value' : ''}">${formatNumber(scores["Visual Consistency"].Style)}</td>
+                <td class="${isMaxLogic ? 'bold-value' : ''}">${formatNumber(scores["Visual Consistency"].Logic)}</td>
+                <td class="${isMaxAvg ? 'bold-value' : ''}">${formatNumber(scores["Avg."])}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function filterByCategory(category) {
+        currentMode = category;
+        populateTable();
+    }
+
+    function formatNumber(num) {
+        return num.toFixed(3);
+    }
+
+    function getColumnIndex(field) {
+        const fieldMap = {
+            'model': 0,
+            'aesthetics': 1,
+            'pa_entity': 2,
+            'pa_attribute': 3,
+            'pa_relation': 4,
+            'vc_identity': 5,
+            'vc_style': 6,
+            'vc_logic': 7,
+            'avg': 8
+        };
+        return fieldMap[field];
+    }
+
+    function sortTable(field, ascending = true) {
+        const tbody = document.querySelector('#modelScoresTable tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        // 记录每一行的初始位置
+        const initialPositions = rows.map(row => {
+            const rect = row.getBoundingClientRect();
+            return rect.top;
+        });
+        
+        // 对行进行排序
+        rows.sort((a, b) => {
+            let aValue, bValue;
+            
+            if (field === 'model') {
+                aValue = a.cells[0].textContent;
+                bValue = b.cells[0].textContent;
+                return ascending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+            } else {
+                const index = getColumnIndex(field);
+                aValue = parseFloat(a.cells[index].textContent);
+                bValue = parseFloat(b.cells[index].textContent);
+                return ascending ? aValue - bValue : bValue - aValue;
+            }
+        });
+
+        // 将排序后的行添加到表格中
+        rows.forEach(row => tbody.appendChild(row));
+        
+        // 获取排序后的位置并设置动画
+        rows.forEach((row, index) => {
+            const newPosition = row.getBoundingClientRect().top;
+            const initialPosition = initialPositions[rows.indexOf(row)];
+            const delta = initialPosition - newPosition;
+            
+            // 设置初始位置
+            requestAnimationFrame(() => {
+                row.style.transform = `translateY(${delta}px)`;
+                
+                // 在下一帧移动到新位置
+                requestAnimationFrame(() => {
+                    row.style.transform = '';
+                });
+            });
+        });
+    }
   </script>
 
 
-
-
-
-
-  <!-- Paper poster -->
-  <!-- <section class="hero is-small is-light">
-    <div class="hero-body">
-      <div class="container">
-        <h2 class="title">Poster</h2>
-
-        <iframe src="static/pdfs/1507_Why_Settle_for_One_Text_t.pdf" width="100%" height="550">
-        </iframe>
-
-      </div>
-    </div>
-  </section> -->
-  <!--End paper poster -->
-
-
-  <!--BibTex citation -->
-  <section class="section" id="BibTeX">
-    <div class="container is-max-desktop content">
-      <h2 class="title">BibTeX</h2>
-      <pre><code>BibTex Code Here</code></pre>
-    </div>
-  </section>
-  <!--End BibTex citation -->
-
-
-  <footer class="footer">
-    <div class="container">
-      <div class="columns is-centered">
-        <div class="column is-8">
-          <div class="content">
-
-            <p>
-              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template"
-                target="_blank">Academic Project Page Template</a> which was adopted from the <a
-                href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
-              You are free to borrow the source code of this website, we just ask that you link back to this page in the
-              footer. <br> This website is licensed under a <a rel="license"
-                href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
-                Commons Attribution-ShareAlike 4.0 International License</a>.
-            </p>
-
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
 
   <!-- Statcounter tracking code -->
 
@@ -1146,19 +1982,3 @@
 </body>
 
 </html>
-
-
-                <!-- <div class="split-row">
-                  <div class="grid-item-half">
-                    <div class="image-container">
-                      <img src="static/images/page2/0012_0010_merge.png" alt="Image 3" />
-                    </div>
-                    <p class="image-description">第三张图片的详细描述：这是一个令人印象深刻的场景...</p>
-                  </div>
-                  <div class="grid-item-half">
-                    <div class="image-container">
-                      <img src="static/images/page2/0012_0010_merge.png" alt="Image 4" />
-                    </div>
-                    <p class="image-description">第四张图片的详细描述：这是另一个场景...</p>
-                  </div>
-                </div> -->
